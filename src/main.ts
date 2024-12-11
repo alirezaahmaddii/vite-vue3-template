@@ -1,16 +1,8 @@
 import { createApp } from "vue"
 import App from "./App.vue"
 import "vuetify/styles/main.sass"
+import "./core/styles/settings.scss"
 import router from "./router";
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-import { createPinia } from "pinia";
+import { registerPlugins } from "@/plugins"
 
-const vuetify = createVuetify({
-    components,
-    directives,
-})
-const pinia = createPinia();
-
-createApp(App).use(vuetify).use(pinia).use(router).mount("#app")
+createApp(App).use(registerPlugins).use(router).mount("#app")
