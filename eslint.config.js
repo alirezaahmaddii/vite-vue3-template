@@ -27,7 +27,7 @@ export default [
         "error",
         {
           selector: "variable",
-          format: ["UPPER_CASE", "camelCase"],
+          format: ["camelCase"],
         },
         {
           selector: "parameter",

@@ -2,7 +2,7 @@
   <v-locale-provider rtl>
     <v-app>
       <v-main>
-        <router-view></router-view>
+        <router-view />
       </v-main>
     </v-app>
   </v-locale-provider>
