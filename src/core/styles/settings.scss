@@ -1,0 +1,13 @@
+/**
+ * src/styles/settings.scss
+ *
+ * Configures SASS variables and Vuetify overwrites
+ */
+
+// Use Vuetify settings with custom font
+@use "vuetify/settings" with (
+  $body-font-family: "IranSans"
+);
+
+@import url("../../assets/styles/font.scss");
+@import url("../../assets/styles/vutify.scss");
