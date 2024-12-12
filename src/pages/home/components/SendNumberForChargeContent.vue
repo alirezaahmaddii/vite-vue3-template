@@ -1,20 +1,32 @@
 <template>
-  <MobileInput
-    v-model:phone-number="mobilePhoneNumber"
-    v-model:is-change-operator="isChangeOperator"
+  <v-text-field
+    v-model="mobilePhoneNumber"
+    :rules="phoneRules"
+    placeholder="شماره موبایل"
+    color="bgGreen"
+    prepend-inner-icon="mdi-cellphone"
+    variant="outlined"
+    type="text"
+    single-line
   />
-  <div class="radio-tabs" v-if="isChangeOperator">
+
+  <v-checkbox
+    v-model="isChangeOperator"
+    label="شماره وارد شده ترابرد کرده است"
+    color="green"
+  />
+  <div v-if="isChangeOperator" class="radio-tabs">
     <v-btn-toggle
-      v-model="selected"
+      v-model="selectedOperator"
       borderless
-      class="tab-toggle"
+      class="tab-toggle w-100"
     >
       <v-btn
         v-for="tab in tabs"
         :key="tab.value"
         :value="tab.value"
-        class="tab-btn"
-        :class="{ active: selected === tab.value }"
+        class="tab-btn border-solid border-sm"
+        :class="{ active: selectedOperator === tab.value }"
       >
         {{ tab.label }}
       </v-btn>
@@ -23,18 +35,37 @@
 </template>
 
 <script setup lang="ts">
-import MobileInput from "@/pages/home/components/MobileInput.vue";
-const mobilePhoneNumber = ref("");
-const isChangeOperator = ref(false);
+import { watch } from "vue";
+
+const mobilePhoneNumber = defineModel<string>("mobilePhoneNumber");
+const isChangeOperator = defineModel<boolean>("isChangeOperator");
+const selectedOperator = defineModel<string>("selectedOperator", {
+  default: "hamrahe-avval",
+});
+
 const tabs = [
-  { value: "tab1", label: "Tab 1" },
-  { value: "tab2", label: "Tab 2" },
-  { value: "tab3", label: "Tab 3" },
+  { value: "hamrahe-avval", label: "همراه اول" },
+  { value: "irancell", label: "ایرانسل" },
+  { value: "rightell", label: "رایتل" },
 ];
-const selected = ref("tab1");
+
+const emit = defineEmits<{
+  (e: "hasError", hasError: boolean): void;
+}>();
+
+const phoneRules = [
+  (value: string) => !!value || "شماره موبایل الزامی است.",
+  (value: string) =>
+    /^09[0-9]{9}$/.test(value) || "فرمت شماره موبایل صحیح نیست.",
+];
+
+watch(mobilePhoneNumber, (newValue) => {
+  const hasError = phoneRules.some((rule) => rule(newValue) !== true);
+  emit("hasError", hasError);
+});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .radio-tabs {
   display: flex;
   justify-content: center;
@@ -42,7 +73,6 @@ const selected = ref("tab1");
 
 .tab-toggle {
   display: flex;
-  border: 1px solid #ccc;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -53,19 +83,17 @@ const selected = ref("tab1");
   padding: 10px 20px;
   font-size: 14px;
   font-weight: bold;
-  border: none;
   background: transparent;
   color: #333;
   transition: all 0.3s ease;
 }
 
 .tab-btn.active {
-  border: 2px solid rgba(181, 196, 88, 1);
+  border: 2px solid rgba(181, 196, 88, 1) !important;
   background-color: rgba(181, 196, 88, 0.1);
   color: rgba(181, 196, 88, 1);
 }
-
-.tab-btn:not(.active):hover {
-  background-color: rgba(0, 0, 0, 0.05);
+::v-deep(.v-input__details) {
+  text-align: start;
 }
-</style>>
+</style>

@@ -9,6 +9,7 @@ export interface IUserRewards {
   icon?: string;
   smallIcon?: string,
   isNab?: boolean,
+  used?: boolean,
 }
 
 export interface IUserInfo {

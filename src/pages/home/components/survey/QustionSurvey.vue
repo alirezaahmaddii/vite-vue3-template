@@ -6,16 +6,16 @@
         width="24"
         height="24"
         src="@/assets/images/webp/question.webp"
-      />
+      >
       <p class="mb-4 fw-500 lh-32 fs-16 text-surface-n40 text-justify">
         {{ question }}
       </p>
     </div>
 
     <div
-      class="rounded-lg pa-3 mb-3 answer d-flex align-center"
       v-for="(answer, index) in answers"
       :key="index"
+      class="rounded-lg pa-3 mb-3 answer d-flex align-center"
       :class="{
         answer__selected: selectedOption?.id === answer.id,
         ' text-surface-n40': selectedOption?.id === answer.id,
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, defineProps, defineEmits } from "vue";
-import type { answer } from "./BottomSheetSurvey.vue";
+import type { IAnswer } from "./BottomSheetSurvey.vue";
 
 defineProps({
   question: {
@@ -40,16 +40,16 @@ defineProps({
     required: true,
   },
   answers: {
-    type: Array as () => answer[],
+    type: Array as () => IAnswer[],
     required: true,
   },
 });
 
 const emit = defineEmits(["selectOption"]);
 
-const selectedOption = ref<answer | null>(null);
+const selectedOption = ref<IAnswer | null>(null);
 
-const selectAnswer = (answer: answer) => {
+const selectAnswer = (answer: IAnswer) => {
   selectedOption.value = answer;
   emit("selectOption", answer);
 };

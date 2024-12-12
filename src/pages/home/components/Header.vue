@@ -8,7 +8,7 @@
       width="24"
       height="24"
       alt="badesaba-icon"
-    />
+    >
     <p class="d-flex text-center text-white lh-44 fs-14 fw-900">
       بـــچرخـــون و بـــبر
     </p>

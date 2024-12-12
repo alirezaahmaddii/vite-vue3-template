@@ -3,8 +3,8 @@
     روش های گرفتن شانس
   </p>
   <ReferalCard class="mb-3" />
-  <div class="v-row mb-6">
-    <div class="v-col pe-1">
+  <div class="d-flex mb-6">
+    <div class="d-flex flex-column pe-1 w-100">
       <luckWaysCard
         :title="bill.title"
         :description="bill.description"
@@ -17,7 +17,7 @@
         :image-src="internet.imageSrc"
       />
     </div>
-    <div class="v-col ps-1">
+    <div class="d-flex flex-column ps-1 w-100">
       <luckWaysCard
         :title="charge.title"
         :description="charge.description"
@@ -38,8 +38,8 @@ import luckWaysCard, { type LuckyWaysCard } from "./LuckyWaysCard.vue";
 import ReferalCard from "./ReferalCard.vue";
 
 import chargeImage from "@/assets/images/webp/charge.webp";
-import internetImage from "@/assets/images/webp/internet.webp";
-import {ref} from "vue";
+import internetImage from "@images/webp/internet.webp";
+import { ref } from "vue";
 
 const bill = ref<LuckyWaysCard>({
   title: "پرداخت قبوض",

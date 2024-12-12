@@ -1,4 +1,7 @@
-
 .v-btn {
-    letter-spacing: normal !important;
-  }
+  letter-spacing: normal !important;
+}
+
+.v-bottom-sheet > .v-bottom-sheet__content.v-overlay__content {
+  box-shadow: none !important;
+}

@@ -1,4 +1,13 @@
 {
+  "compilerOptions": {
+    "types": [
+      "node",
+      "vite/client"
+    ],
+    "typeRoots": [
+      "./node_modules/@types/node"
+    ]
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

@@ -44,7 +44,12 @@ export default [
         },
         {
           selector: "method",
-          format: ["camelCase"],
+          format: ["camelCase", "snake_case"],
+          "filter": {
+            "regex": "^onUpdate:",
+            "match": false
+          }
+
         },
         {
           selector: "function",

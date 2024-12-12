@@ -1,11 +1,12 @@
-import { getToken } from "@/core/utils/token.function";
+import { getSurveyAnswer, getToken } from "@/core/utils/token.function";
 import { executeSpin } from "@/core/services/execute-spin.api";
 import { SnackbarStatusEnum } from "@/core/enums/snackbar.enum";
 import { useLoginStore } from "@/stores/login";
 import { useSnackbarStore } from "@/stores/snackbar";
-import {ref,type Ref} from "vue";
-import {useUserInfoStore} from "@/stores/user-info";
-import type {IUserRewards} from "@/core/models/user-info.interface";
+import { ref, type Ref } from "vue";
+import { useUserInfoStore } from "@/stores/user-info";
+import type { IUserRewards } from "@/core/models/user-info.interface";
+import { useSurveyStore } from "@/stores/survey";
 
 export const useExecuteSpin = (totalSlices: number, isSpinning: Ref<boolean>) => {
   const lucks = [
@@ -26,14 +27,18 @@ export const useExecuteSpin = (totalSlices: number, isSpinning: Ref<boolean>) =>
   const rotationAngle = ref<number>(0);
   const awardWinnerLuck = ref<IUserRewards>({})
   const userInfoStore = useUserInfoStore();
+  const surveyStore = useSurveyStore();
 
   const spinStart = () => {
-    if (!getToken()?.length) {
+    if (!getToken()) {
       loginStore.setOpenLoginState(true);
       return;
     }
+    if (!getSurveyAnswer()) {
+      surveyStore.openSurvey = true;
+    }
     if (isSpinning.value) return;
-    if (userInfoStore.userData.score === 0 || !userInfoStore.userData.referralLink  ) return;
+    if (userInfoStore.userData.score === 0 || !userInfoStore.userData.referralLink) return;
 
     isSpinning.value = true;
 
@@ -48,7 +53,7 @@ export const useExecuteSpin = (totalSlices: number, isSpinning: Ref<boolean>) =>
         const index = lucks.indexOf(winnerLuck.value);
         if (index === -1) {
           snackbarStore.showSnackbar({
-            message: 'لطفا دوباره تلاش کنید.',
+            message: "لطفا دوباره تلاش کنید.",
             type: SnackbarStatusEnum.Error,
           });
           return;

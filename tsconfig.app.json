@@ -1,14 +1,18 @@
 {
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue",  "components.d.ts","globals.d.ts"],
+  "include": ["@types/*.d.ts", "src/**/*", "src/**/*.vue",  "components.d.ts","globals.d.ts"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@images": ["./src/assets/images/*"],
     }
   },
+  "types": [
+    "node",
+    "vite/client"
+  ],
   "allowSyntheticDefaultImports": true
 }

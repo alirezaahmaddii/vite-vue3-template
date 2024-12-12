@@ -33,7 +33,10 @@
         </div>
 
         <slot :name="slotType" />
-        <v-btn class="w-sm-50 w-100 mt-10 mx-auto">
+        <v-btn
+          class="w-sm-50 w-100 mt-10 mx-auto"
+          @click="handleClick"
+        >
           {{ textBtn }}
         </v-btn>
       </v-card>
@@ -51,11 +54,15 @@ defineProps<{
   title: string,
   description?: string,
   icon: string,
-  textBtn: string
+  textBtn: string,
+}>()
+
+const emit = defineEmits<{
+  (event: "submitBottomSheet"): void
 }>()
 
 const slotType = ref("content");
-
+const handleClick = () => emit("submitBottomSheet");
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,5 @@
 <template>
   <div class="container w-100 h-100 px-4 py-5 mx-auto overflow-x-hidden">
-<!--  ` <SendNumberForChargeContent />-->
     <app-header />
     <wheel-image
       carousel-icon="/melon.png"
@@ -26,18 +25,17 @@
       :text-btn="textBtn"
       :is-open-bottom-sheet="isOpenBottomSheet"
       @update:is-open-bottom-sheet="isOpenBottomSheet = !isOpenBottomSheet"
+      @submit-bottom-sheet="submitBottomSheetBtn"
     >
       <template #content>
         <component :is="computedContent" />
       </template>
     </bottom-sheet-award>
-    <bottomSheetSurvey></bottomSheetSurvey>
+    <bottomSheetSurvey />
   </div>
 </template>
 
 <script setup lang="ts">
-import { VBadge } from "vuetify/components";
-import { useSurveyStore } from "@/stores/survey";
 import appHeader from "./components/Header.vue"
 import {useExecuteSpin} from "@/pages/home/composable/useExecuteSpin";
 import {getUserInfo} from "@/core/services/get-user-info.api";
@@ -47,8 +45,9 @@ import type {IUserRewards} from "@/core/models/user-info.interface";
 import {SnackbarStatusEnum} from "@/core/enums/snackbar.enum";
 import {useSnackbarStore} from "@/stores/snackbar";
 import {getToken} from "@/core/utils/token.function";
-import MobileInput from "@/pages/home/components/MobileInput.vue";
-// import SendNumberForChargeContent from "./components/SendNumberForChargeContent.vue";
+import TwoStepUseRewardContent from "./components/TwoStepUseRewardContent.vue";
+import {useReward} from "@/core/services/user-reward";
+import {IUseReward} from "@/core/models/use-reward.interface";
 
 const luckyWaysGetting = defineAsyncComponent(
   () => import("./components/LuckyWaysGetting.vue")
@@ -74,14 +73,16 @@ const textBtn = ref<string>("تایید");
 const awardChoices = ref<IUserRewards>({});
 const isOpenBottomSheet = ref<boolean>(false);
 const isSpinning = ref<boolean>(false);
-
+const mobilePhoneNumber = ref("");
+const selectedOperator = ref<string>("hamrahe-aval");
+const isChangeOperator = ref(false)
 const userInfoStore = useUserInfoStore();
 const snackbarStore = useSnackbarStore();
 const { spinStart, rotationAngle, awardWinnerLuck } = useExecuteSpin(
   8,
   isSpinning
 );
-
+const hasErrorOfValidation = ref<boolean>(false);
 const doneWheel = () => {
   if (awardWinnerLuck.value.rewardType) {
     isOpenBottomSheet.value = true;
@@ -112,8 +113,8 @@ const getUserInformation = () => {
 const computedContent = computed(() =>
   getAwardContent(awardChoices.value.rewardType as string)
 );
-
 const getAwardContent = (type: string) => {
+  textBtn.value = "تایید"
   description.value = "";
   switch (type) {
     case "lottery_chance_200_million":
@@ -140,48 +141,92 @@ const getAwardContent = (type: string) => {
       });
 
     case "charge":
-      return h(VBadge, {
-        content: "شارژ موردنظر تا 24 ساعت آینده فعال خواهد شد",
-        inline: true,
-        color: "light-green-lighten-4",
-        textColor: "light-green",
-        class: "badge-padding",
+      return h(TwoStepUseRewardContent, {
+        typeRewardTwoStep: "charge",
+        isUsed: awardChoices.value.used as boolean,
+        "onUpdate:mobile-phone-number": (value:string) => mobilePhoneNumber.value = value,
+        "onUpdate:is-change-operator": (value:boolean) => isChangeOperator.value = value,
+        "onUpdate:selected-operator": (value:string) => selectedOperator.value = value,
+        onHasError: (hasError) => hasErrorOfValidation.value = hasError,
       });
 
     case "internet":
-      return h(VBadge, {
-        content: "بسته موردنظر تا 24 ساعت آینده فعال خواهد شد",
-        inline: true,
-        color: "light-green-lighten-4",
-        textColor: "light-green",
-        class: "badge-padding",
+      return h(TwoStepUseRewardContent, {
+        typeRewardTwoStep: "charge",
+        isUsed: awardChoices.value.used as boolean,
+        "onUpdate:mobile-phone-number": (value:string) => mobilePhoneNumber.value = value,
+        "onUpdate:is-change-operator": (value:boolean) => isChangeOperator.value = value,
+        "onUpdate:selected-operator": (value:string) => selectedOperator.value = value,
+        onHasError: (hasError) => hasErrorOfValidation.value = hasError,
       });
-
-    case "send_charge":
-      description.value =
-        "لطفا شماره موبایلی که میخواهید شارژ به اون واریز بشه رو وارد کنید";
-      return h(MobileInput);
-
-    case "send_internet":
-      description.value =
-        "لطفا شماره موبایلی که میخواهید بسته به اون واریز بشه رو وارد کنید";
-      return h(MobileInput);
 
     case "cash":
       description.value =
-        "لطفا شماره موبایلی که میخواهید بسته به اون واریز بشه رو وارد کنید";
+        "دوستان شما در بادصبا تا 24 ساعت آینده با شما تماس میگیرند.";
       return;
 
     default:
       return "";
   }
 };
-
-const surveyStore = useSurveyStore();
 onMounted(() => {
   if (getToken()) getUserInformation();
-  surveyStore.openSurvey = true;
 });
+
+const useRewardCharge = () => {
+  if (!hasErrorOfValidation.value) {
+    const rewardData:IUseReward = {
+      cellphone: mobilePhoneNumber.value,
+      userRewardId: awardChoices.value.userRewardId as string,
+    };
+
+    if (isChangeOperator.value) {
+      rewardData.operator = selectedOperator.value;
+      rewardData.simType = "post-paid";
+    }
+    useReward(rewardData).then((response) => {
+      awardChoices.value.used = true;
+      snackbarStore.showSnackbar({
+        message: response.message,
+        type: SnackbarStatusEnum.Success,
+      });
+    }).catch((error) => {
+      snackbarStore.showSnackbar({
+        message: error.response.data.message,
+        type: SnackbarStatusEnum.Error,
+      });
+    });
+  }
+}
+
+const actionHandlers = {
+  "nab_profile": () => {
+    console.log("Navigate to profile");
+  },
+  "habl_discount": () => {
+    console.log("Handle habl_discount");
+  },
+  "bab_discount": () => {
+    console.log("Handle bab_discount");
+  },
+  charge: () => {
+    useRewardCharge();
+  },
+  internet: () => {
+    useRewardCharge();
+  },
+  cash: () => {
+    console.log("Handle cash reward");
+  },
+  default: () => {
+    isOpenBottomSheet.value = !isOpenBottomSheet.value
+  },
+};
+
+const submitBottomSheetBtn = () => {
+  const handler = actionHandlers[awardChoices.value.rewardType] || actionHandlers.default;
+  handler();
+}
 </script>
 
 <style lang="scss" scoped>

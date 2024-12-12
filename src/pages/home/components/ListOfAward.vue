@@ -6,7 +6,7 @@
     <div
       v-for="(item, index) in listAward"
       :key="index"
-      class="list-award"
+      class="justify-center"
       @click="handleClickOnAward(item)"
     >
       <CardOfAward
@@ -34,8 +34,4 @@ const handleClickOnAward = (award: IUserRewards) => {
 };
 </script>
 
-<style lang="scss" scoped>
-.list-award {
-  justify-items: center;
-}
-</style>
+<style lang="scss" scoped></style>

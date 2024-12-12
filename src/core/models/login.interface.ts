@@ -22,8 +22,14 @@ export interface IVerifyCellphonePayload {
   verificationCode: string,
 }
 
+export interface ISurveyResult {
+  key: number;
+  value: "A" | "B" | "C";
+}
+
 export interface IRegisterWheelPayload {
-  referralKey: string
+  referralKey: string;
+  surveyResult: ISurveyResult[]
 }
 export interface IRegisterWheelDto extends IRegisterWheelPayload, IUserInfo {
   referralActivation: {

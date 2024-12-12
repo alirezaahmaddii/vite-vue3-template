@@ -135,32 +135,28 @@ interface IVForm {
 }
 import type {
   IRegisterCellphoneDto,
-  IRegisterWheelDto,
   IVerifyCellphoneDto,
   IVerifyCellphonePayload,
   OTPRequestDto,
 } from "@/core/models/login.interface";
-import {
-  registerCellphone,
-  verifyCellphone,
-  registerWheel,
-} from "@/core/services/auth.api";
+import { registerCellphone, verifyCellphone } from "@/core/services/auth.api";
 import {
   callAppUriLogin,
+  getSurveyAnswer,
   setPhone,
   setToken,
 } from "@/core/utils/token.function";
-import { computed, inject, ref, watch } from "vue";
+import {computed, inject, Ref, ref, watch} from "vue";
 import { useLoginStore } from "@/stores/login";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { SnackbarStatusEnum } from "../enums/snackbar.enum";
-import { useRoute } from "vue-router";
-import { useUserInfoStore } from "@/stores/user-info";
+import { Ref } from "vue";
+import { useSurveyStore } from "@/stores/survey";
+import { useRegisterWheelConfirm } from "../composable/useRegisterWheel";
 
+const { registerWheelConfirm } = useRegisterWheelConfirm();
 const snackbarStore = useSnackbarStore();
-const userInfoStore = useUserInfoStore();
-const route = useRoute();
-
+const surveyStore = useSurveyStore();
 const loginStore = useLoginStore();
 const isOpenOtp = ref<boolean>(false);
 const loginLoading = ref<boolean>(false);
@@ -267,6 +263,7 @@ const handleBlurInput = () => {
 const countDownTimer = (maxTimeLeft = 60) => {
   timeLeft.value = maxTimeLeft;
   if (intervalTimer) clearInterval(intervalTimer);
+  //@ts-ignore
   intervalTimer = setInterval(() => {
     if (timeLeft.value <= 0) {
       if (intervalTimer) clearInterval(intervalTimer);
@@ -352,8 +349,12 @@ const verify = () => {
         setToken(token);
         setPhone(phoneNumber.value as string);
         callAppUriLogin(phoneNumber.value as string, token);
+        if (!getSurveyAnswer()) {
+          surveyStore.openSurvey = true;
+        } else {
+          registerWheelConfirm();
+        }
         loginFunction.value?.();
-        registerWheelConfirm();
       }
     })
     .catch((error: string) => {
@@ -370,13 +371,6 @@ const verify = () => {
     .finally(() => {
       loginLoading.value = false;
     });
-};
-const registerWheelConfirm = () => {
-  registerWheel({ referralKey: route.query?.referralKey as string }).then(
-    (response: IRegisterWheelDto) => {
-      userInfoStore.updateUserData(response);
-    }
-  );
 };
 </script>
 <style lang="scss" scoped>

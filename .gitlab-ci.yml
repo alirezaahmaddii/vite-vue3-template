@@ -1,0 +1,25 @@
+stages:
+  - deploy
+
+variables:
+  SERVER_IP: $MOCK_SERVER_IP
+  PROJECT_DIRECTORY: /deployment/projects/frontend/badesaba/wheel-of-luck
+
+deploy-job:
+  stage: deploy
+  image: $UBUNTU_IMAGE
+  before_script:
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_PRIVATE_NEW_MOCK_SERVER_KEY" >> ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+    - ssh-keyscan $SERVER_IP >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying application..."
+    - ssh mock@$SERVER_IP "cd $PROJECT_DIRECTORY && git checkout develop && git pull && docker-compose -f mock.docker-compose.yml down &&  docker-compose -f mock.docker-compose.yml up --build -d"
+    - echo "Application successfully deployed."
+  only:
+    - develop
+  interruptible: true

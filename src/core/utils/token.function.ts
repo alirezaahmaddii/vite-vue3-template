@@ -3,6 +3,8 @@ import { parseJwt } from "./parse-jwt.function";
 const tokenName = "badesaba/wheel/token";
 const phoneNumberKey = "badesaba/wheel/phone";
 const btokenName = "badesaba/wheel/btoken";
+const surveyAnswerName = "badesaba/wheel/survey";
+
 
 export interface IDecodedToken {
   authorization: string;
@@ -16,6 +18,14 @@ export function getToken(): string | null {
 
 export function setToken(token: string): void {
   localStorage.setItem(tokenName, token);
+}
+
+export function getSurveyAnswer(): string | null {
+  return localStorage.getItem(surveyAnswerName);
+}
+
+export function setSurveyAnswer(token: string): void {
+  localStorage.setItem(surveyAnswerName, token);
 }
 
 export function removeToken(): void {
